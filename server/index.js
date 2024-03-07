@@ -1,31 +1,29 @@
 import express from 'express';
-import * as dotenv from 'dotenv';
+import dotenv from 'dotenv';
 import cors from 'cors';
-import connectDB from './mongodb/connect';
+import connectDB from './config/connect.js'; // Import your MySQL connection module
 
-dotenv.config(); //pool environment variable from dotenv
+dotenv.config(); // Load environment variables from .env file
 
-const app = express(); //initialize our express application
-app.use(cors()); //adding middleware
-app.use(express.json( { limit: '50mb' } )); //another middleware
+const app = express(); // Initialize Express application
+app.use(cors()); // Enable CORS
+app.use(express.json({ limit: '50mb' })); // Enable JSON parsing middleware
 
-//first route
-app.get('/', async(req, res) => {
+// Define a simple route
+app.get('/', async (req, res) => {
     res.send('Hello from AI Image Generator');
-})
+});
 
-
-//to run our app
-const startServer = async() => {
-
-    try{
-        connectDB(process.env.MONGODB_URL);
-        app.listen(8080, () => console.log('Server has started on port http://localhost:8080'))
+// Function to start the server
+const startServer = async () => {
+    try {
+        await connectDB(); // Connect to MySQL
+        const port = process.env.PORT || 8080; // Use the specified port from environment or default to 8080
+        app.listen(port, () => console.log(`Server has started on port http://localhost:${port}`));
+    } catch (error) {
+        console.error('Error starting server:', error);
     }
-    catch{error}
-    {
-        console.log(error);
-    }
-}
+};
 
+// Call the startServer function to start the server
 startServer();
